@@ -2,5 +2,5 @@ include README.md
 include LICENSE
 include *.sh
 include *.md
-src/*
-pycryptonight/tests/data/*
+include src/*
+include pycryptonight/tests/data/*
