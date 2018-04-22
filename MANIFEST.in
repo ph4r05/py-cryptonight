@@ -3,4 +3,7 @@ include LICENSE
 include *.sh
 include *.md
 include src/*
+include src/cryptonight/*
 include pycryptonight/tests/data/*
+graft src
+graft src/cryptonight

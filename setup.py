@@ -40,7 +40,7 @@ hash_module = Extension('_pycryptonight',
                             'src/cryptonight/slow-hash.c',
                             'src/pycryptonight.c',
                         ],
-                        include_dirs=['.', './src/', './src/cryptonight'],
+                        include_dirs=['.', 'src/', 'src/cryptonight'],
                         define_macros=[
                             ('NO_AES', 1)
                         ],
