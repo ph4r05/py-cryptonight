@@ -11,7 +11,7 @@ files.
 Py2, Py3 compatible + tests.
 
 ```
-pip install py_cryptonight
+pip install py-cryptonight
 ```
 
 ## Usage
