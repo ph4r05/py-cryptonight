@@ -22,15 +22,15 @@ class PyCryptoNightTest(unittest.TestCase):
         self.tst_method('tests-slow-1.txt', lambda x: pycryptonight.cn_slow_hash(x, 1))
 
     def tst_method(self, fname, fnc):
-        data_file = pkg_resources.resource_stream(__name__, os.path.join('data', fname))
-        for idx, line in enumerate(data_file):
-            line = line.strip()
-            if line == '':
-                continue
+        with pkg_resources.resource_stream(__name__, os.path.join('data', fname)) as data_file:
+            for idx, line in enumerate(data_file):
+                line = line.strip()
+                if line == '':
+                    continue
 
-            expected, inp = line.split(' ', 2)
-            res = fnc(binascii.unhexlify(inp))
-            self.assertEqual(binascii.unhexlify(expected), res)
+                expected, inp = line[:64], line[65:]
+                res = fnc(binascii.unhexlify(inp))
+                self.assertEqual(binascii.unhexlify(expected), res)
 
 
 if __name__ == "__main__":
