@@ -45,7 +45,7 @@ hash_module = Extension('_pycryptonight',
                             ('NO_AES', 1)
                         ],
                         extra_compile_args=[
-                                    '-std=c99',
+                                    '-std=c11',
                                     # For testing only - some of these are GCC-specific
                                     # '-Wall',
                                     # '-Wextra',

@@ -216,7 +216,7 @@ static inline void memcpy_swap64(void *dst, const void *src, size_t n) {
 #endif
 
 #if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
-assert(false && "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");
+static_assert(false, "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");
 #endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
