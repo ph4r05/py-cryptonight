@@ -10,6 +10,10 @@ files.
 
 Py2, Py3 compatible + tests.
 
+```
+pip install py_cryptonight
+```
+
 ## Usage
 
 ```python
