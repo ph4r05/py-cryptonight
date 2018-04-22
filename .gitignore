@@ -94,4 +94,5 @@ ENV/
 alembic.ini
 *.o
 build/
+venv2/
 
