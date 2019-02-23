@@ -95,4 +95,5 @@ alembic.ini
 *.o
 build/
 venv2/
-
+*.egg-info
+cmake-build-*

@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools import Extension
 from setuptools import find_packages
 
-version = '0.1.9'
+version = '0.2.0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
@@ -24,12 +24,14 @@ docs_extras = [
     'sphinxcontrib-programoutput',
 ]
 
-use_aes = int(os.getenv('MONERO_USE_AES', 1))
+no_aes = int(os.getenv('MONERO_NO_AES', 0))
+no_jit = int(os.getenv('MONERO_NO_JIT', 1))
 hash_module = Extension('_pycryptonight',
                         sources=[
                             'src/cryptonight/aesb.c',
                             'src/cryptonight/blake256.c',
                             'src/cryptonight/CryptonightR_JIT.c',
+                            'src/cryptonight/CryptonightR_template.c',
                             'src/cryptonight/groestl.c',
                             'src/cryptonight/hash.c',
                             'src/cryptonight/hash-extra-blake.c',
@@ -45,11 +47,12 @@ hash_module = Extension('_pycryptonight',
                         ],
                         include_dirs=['.', 'src/', 'src/cryptonight'],
                         define_macros=[
-                           ('NO_AES', 1) if not use_aes else ('USE_AES', 1)
+                           ('NO_AES', 1) if no_aes else ('USE_AES', 1),
+                           ('NO_JIT', 1) if no_jit else ('USE_JIT', 1),
                         ],
                         extra_compile_args=[
                                     '-std=c11',
-                                    '-maes' if use_aes else '',
+                                    '-maes' if not no_aes else '',
                                     # '--disable-modules=aes',
                                     # For testing only - some of these are GCC-specific
                                     # '-Wall',

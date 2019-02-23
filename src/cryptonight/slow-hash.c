@@ -44,6 +44,7 @@
 
 #include <errno.h>
 #include <string.h>
+#define NO_AES 1
 
 #define MEMORY         (1 << 21) // 2MB scratchpad
 #define ITER           (1 << 20)
@@ -498,7 +499,9 @@ volatile int use_v4_jit_flag = -1;
 
 STATIC INLINE int use_v4_jit(void)
 {
-#if defined(__x86_64__)
+#if defined(NO_JIT)
+  return 0
+#elif defined(__x86_64__)
 
   if (use_v4_jit_flag != -1)
     return use_v4_jit_flag;
@@ -1574,6 +1577,8 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
 #else
 // Portable implementation as a fallback
 
+static v4_random_math_JIT_func hp_jitfunc = NULL;
+
 void slow_hash_allocate_state(void)
 {
   // Do nothing, this is just to maintain compatibility with the upgraded slow-hash.c
@@ -1584,6 +1589,11 @@ void slow_hash_free_state(void)
 {
   // As above
   return;
+}
+
+static inline int use_v4_jit(void)
+{
+  return 0;
 }
 
 static void (*const extra_hashes[4])(const void *, size_t, char *) = {

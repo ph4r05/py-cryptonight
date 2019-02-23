@@ -60,7 +60,7 @@ PyDoc_STRVAR(_pycryptonight_cn_slow_hash__doc__,
 static PyObject *_pycryptonight_cn_slow_hash(PyObject *self, PyObject *args, PyObject *kwargs)
 {
 #if PY_MAJOR_VERSION >= 3
-    static const char *format = "z#|ii:cn_slow_hash";
+    static const char *format = "z#|iil:cn_slow_hash";
 #else
     static const char *format = "s#|iil:cn_slow_hash";
 #endif
