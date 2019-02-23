@@ -31,3 +31,15 @@ pycryptonight.cn_slow_hash(binascii.unhexlify(b'38274c97c45a172cfc97679870422e3a
 # hexcoded: b'ed082e49dbd5bbe34a3726a0d1dad981146062b39d36d62c71eb1ed8ab49459b
 ```
 
+## Build problems
+
+The extension builds with AES extension by default. To disable this:
+
+```bash
+MONERO_USE_AES=0 python setup.py install
+```
+
+## Donations
+Thanks for your support!
+
+47BEukN83whUdvuXbaWmDDQLYNUpLsvFR2jioQtpP5vD8b3o74b9oFgQ3KFa3ibjbwBsaJEehogjiUCfGtugUGAuJAfbh1Z

@@ -62,18 +62,19 @@ static PyObject *_pycryptonight_cn_slow_hash(PyObject *self, PyObject *args, PyO
 #if PY_MAJOR_VERSION >= 3
     static const char *format = "z#|ii:cn_slow_hash";
 #else
-    static const char *format = "s#|ii:cn_slow_hash";
+    static const char *format = "s#|iil:cn_slow_hash";
 #endif
-    static char *keywords[] = {"data", "variant", "prehashed", NULL};
+    static char *keywords[] = {"data", "variant", "prehashed", "height", NULL};
 
     Py_ssize_t input_len=0;
     char *data = NULL;
     char hash[HASH_SIZE];
     int variant = 0;
     int prehashed = 0;
+    long int height = 0;
     PyObject *result = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, format, keywords, &data, &input_len, &variant, &prehashed)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, format, keywords, &data, &input_len, &variant, &prehashed, &height)) {
         goto bail;
     }
 
@@ -82,7 +83,7 @@ static PyObject *_pycryptonight_cn_slow_hash(PyObject *self, PyObject *args, PyO
         goto bail;
     }
 
-    cn_slow_hash(data, input_len, hash, variant, prehashed);
+    cn_slow_hash(data, input_len, hash, variant, prehashed, height);
 
 #if PY_MAJOR_VERSION >= 3
     result = PyBytes_FromStringAndSize(hash, HASH_SIZE); // Py_BuildValue("y#", hash, HASH_SIZE);
