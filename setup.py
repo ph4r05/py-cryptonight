@@ -51,7 +51,7 @@ hash_module = Extension('_pycryptonight',
                            ('NO_JIT', 1) if no_jit else ('USE_JIT', 1),
                         ],
                         extra_compile_args=[
-                                    '-std=c11',
+                                    '-std=gnu11',
                                     '-maes' if not no_aes else '',
                                     # '--disable-modules=aes',
                                     # For testing only - some of these are GCC-specific
