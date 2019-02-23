@@ -44,7 +44,6 @@
 
 #include <errno.h>
 #include <string.h>
-#define NO_AES 1
 
 #define MEMORY         (1 << 21) // 2MB scratchpad
 #define ITER           (1 << 20)
@@ -500,7 +499,7 @@ volatile int use_v4_jit_flag = -1;
 STATIC INLINE int use_v4_jit(void)
 {
 #if defined(NO_JIT)
-  return 0
+  return 0;
 #elif defined(__x86_64__)
 
   if (use_v4_jit_flag != -1)

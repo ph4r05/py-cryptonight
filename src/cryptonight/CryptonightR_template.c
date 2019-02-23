@@ -27,6 +27,13 @@
 #elif defined(__INTEL_COMPILER)
 #define ASM __asm__
 #elif !defined(_MSC_VER)
+
+// https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html
+// GCC uses AT&T/UNIX assembly syntax
+//  - Op-code src dst
+//  - registers prefixed with %
+//  - constants prefixed with $
+
 #define ASM __asm__
 #define ASM_B ASM(
 #define ASM_E );
@@ -34,13 +41,13 @@
 #define R(x) "%"#x
 #define C(x) "$"#x
 
-#define IMUL(a, b) "imul "b", "a"\n\t"
-#define ADD(a, b) "add "b", "a"\n\t"
-#define SUB(a, b) "sub "b", "a"\n\t"
-#define ROR(a, b) "ror "b", "a"\n\t"
-#define ROL(a, b) "rol "b", "a"\n\t"
-#define XOR(a, b) "xor "b", "a"\n\t"
-#define MOV(a, b) "mov "b", "a"\n\t"
+#define IMUL(a, b) "imull "b", "a"\n\t"
+#define ADD(a, b) "addl "b", "a"\n\t"
+#define SUB(a, b) "subl "b", "a"\n\t"
+#define ROR(a, b) "rorl "b", "a"\n\t"
+#define ROL(a, b) "roll "b", "a"\n\t"
+#define XOR(a, b) "xorl "b", "a"\n\t"
+#define MOV(a, b) "movl "b", "a"\n\t"
 
 #else
 
