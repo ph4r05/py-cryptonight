@@ -46,11 +46,13 @@ pycryptonight.cn_slow_hash(b'1', 4, prehashed=0, height=1)  # variant 4, height 
 
 ## Build problems
 
-The extension builds with AES extension by default. To disable this:
+The extension builds with AES extension by default. To disable this, rebuild with:
 
 ```bash
-MONERO_USE_AES=0 python setup.py install
+MONERO_NO_AES=1 python setup.py install
 ```
+
+### JIT
 
 The JIT is disabled by default as the implementation was not properly tested.
 If you want to experiment with JIT you need to compile with:
@@ -65,7 +67,19 @@ was generated with [tools/convert_s_to_c.py](tools/convert_s_to_c.py) script.
 
 JIT was not tested properly. If segfaults currently.
 
+```bash
+MONERO_USE_CNV4_JIT=1 ./test.sh
+```
+
+To rebuild locally and test:
+
+```bash
+MONERO_NO_AES=0 MONERO_NO_JIT=0 python setup.py develop
+MONERO_USE_CNV4_JIT=0 ./test.sh
+MONERO_USE_CNV4_JIT=1 ./test.sh
+```
+
 ## Donations
 Thanks for your support!
 
-47BEukN83whUdvuXbaWmDDQLYNUpLsvFR2jioQtpP5vD8b3o74b9oFgQ3KFa3ibjbwBsaJEehogjiUCfGtugUGAuJAfbh1Z
+`47BEukN83whUdvuXbaWmDDQLYNUpLsvFR2jioQtpP5vD8b3o74b9oFgQ3KFa3ibjbwBsaJEehogjiUCfGtugUGAuJAfbh1Z`
