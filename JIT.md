@@ -3,6 +3,24 @@
 JIT optimization feature for CNv4 `cn_slow_hash()`.
 JIT can boost the performance significantly.
 
+JIT feature is experimental and was not properly tested on multiple platforms.
+
+I tested on:
+ - OSX LLVM
+ - Ubuntu 18.10 GCC
+
+
+## Static JIT
+
+By default, the static JIT is used.
+It is pre-computed instruction table in bytes for x86_64 architecture.
+
+For other architectures the dynamic JIT has to be used, i.e., ASM to bytes extraction.
+
+To disable static JIT define `MONERO_STATIC_JIT=0`.
+
+## Dynamic JIT
+
 ### Problem
 
 Python distutils cannot compile `.S` file so a
@@ -33,10 +51,10 @@ pycryptonight`CryptonightR_instruction120:
 
 ### Solution
 
-In order to remove function prologue, use `__attribute__ ((naked))`.
+In order to remove a function prologue, we could use `__attribute__ ((naked))`.
 However, `naked` attribute is not supported by GCC.
 
-The problem also is we dont know where the function ends.
+The problem also is we don't know where the function ends.
 
 ```asm
 pycryptonight`CryptonightR_instruction0:
@@ -50,7 +68,7 @@ pycryptonight`CryptonightR_instruction1:
     0x108879665 <+5>:  66 66 2e 0f 1f 84 00 00 00 00 00  nopw   %cs:(%rax,%rax)
 ```
 
-The idea is to add known trailing sequence to mark end of the function, such as
+The idea is to add a known trailing sequence to mark end of the function, such as
 
 ```c
 #define ASM_E ".byte 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90\n\t");
@@ -83,6 +101,8 @@ Note: Debugging mode messes up instruction codes when read from LLDB vs read by 
 I.e., LLDB memory view displays correctly `0f af db` bytes, so comparison should
 match the known instruction and determine the length of the function prefix.
 However, the real execution prints `cc af db` instead (?!).
+
+Code for detecting the beginning and end of our instruction sequences.
 
 ```c
 static unsigned inst_lengths[257];
@@ -127,24 +147,56 @@ Then in the JIT build code:
 	}
 ```
 
-### Alternative 1
+#### Dynamic JIT
 
-Manual instruction table. Prologue is hand-made anyway.
-Thus create an array of instructions like `imull  %ebx, %ebx`.
-Need to store instruction length somehow.
+This worked on OSX and LLVM however the compilation under Ubuntu 18.10 and GCC
+fails to add NOPs to the functions so the bodies cannot be detected.
 
-```asm
-0x108879650 <+0>: 0f af db                          imull  %ebx, %ebx
+Due to this, dynamic JIT compilation requires to use top-level ASM so
+the defined functions are exactly as we want them
+
+```c
+ASM_FNC(CryptonightR_instruction42,
+        IMUL(R(esi), R(esi))
+)
 ```
 
-### Alternative 2
+Generates
+
+```c
+__asm__ ("_CryptonightR_instruction42:\n\t"
+        "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"
+        "imull %esi, %esi\n\t"
+        "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"
+        ".global _CryptonightR_instruction42\n");
+```
+
+While on Win it generates:
+
+```c
+__declspec(naked) void CryptonightR_instruction42(void){
+    __asm { nop; nop; nop; nop; nop; nop; nop; nop; imul esi, esi; nop; nop; nop; nop; nop; nop; nop; nop;
+    }
+}
+```
+
+
+#### Static table
+
+The static instruction table is generated if `-DDUMP_JIT=1` is defined.
+The instruction table was generated to [CryptonightR_JIT_x86_64.c](src/cryptonight/CryptonightR_JIT_x86_64.c)
+
+The static table is used if `-DSTATIC_JIT=1` is defined.
+
+
+### Alternative 1
 
 Use JIT library to generate ASM code:
 
 https://github.com/asmjit/asmjit
 
 
-### Alternative 3
+### Alternative 2
 Note: *Not working*
 
 Using GCC feature of label addresses and `&&` operator.

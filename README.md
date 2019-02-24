@@ -60,15 +60,6 @@ If you want to experiment with JIT you need to compile with:
 
 ```bash
 MONERO_NO_JIT=0 python setup.py install
-```
-
-JIT could not be directly compiled as I am not aware of any easy way for a Python extension
-to compile `.S` file. Thus a [CryptonightR_template.c](src/cryptonight/CryptonightR_template.c) file
-was generated with [tools/convert_s_to_c.py](tools/convert_s_to_c.py) script.
-
-JIT was not tested properly on different platforms.
-
-```bash
 MONERO_USE_CNV4_JIT=1 ./test.sh
 ```
 

@@ -1,6 +1,8 @@
 #ifndef CRYPTONIGHTR_JIT_H
 #define CRYPTONIGHTR_JIT_H
 
+#include "CryptonightR_base.h"
+
 // Minimalistic JIT code generator for random math sequence in CryptonightR
 //
 // Usage:

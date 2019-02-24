@@ -44,15 +44,35 @@ for idx, line in enumerate(lines):
         body.append(m2.groups())
 instructions.append((fnc_name, body))
 
-for fname, body in instructions:
-    print('ASMFNC void %s(void){' % fname)
-    print('  ASM_B')
-    for b in body:
-        arg1 = try_int(b[1])
-        arg2 = try_int(b[2])
-        arg1s = ('C(%s)' % arg1) if isinstance(arg1, int) else ('R(%s)' % arg1)
-        arg2s = ('C(%s)' % arg2) if isinstance(arg2, int) else ('R(%s)' % arg2)
-        print('    %s(%s, %s)' % (b[0].upper(), arg1s, arg2s))
-    print('    NOP()')
-    print('  ASM_E')
-    print('}\n')
+def gen_functions(instructions):
+    for fname, body in instructions:
+        print('ASMFNC void %s(void){' % fname)
+        # print('ins_%s_s:' % fname.lower())
+        print('  ASM_B')
+        for b in body:
+            arg1 = try_int(b[1])
+            arg2 = try_int(b[2])
+            arg1s = ('C(%s)' % arg1) if isinstance(arg1, int) else ('R(%s)' % arg1)
+            arg2s = ('C(%s)' % arg2) if isinstance(arg2, int) else ('R(%s)' % arg2)
+            print('    %s(%s, %s)' % (b[0].upper(), arg1s, arg2s))
+        print('    NOP()')
+        print('  ASM_E')
+        print('}\n')
+
+
+def gen_asms(instructions):
+    for fname, body in instructions:
+        print('ASM_FNC(%s, ' % fname)
+        for b in body:
+            arg1 = try_int(b[1])
+            arg2 = try_int(b[2])
+            arg1s = ('C(%s)' % arg1) if isinstance(arg1, int) else ('R(%s)' % arg1)
+            arg2s = ('C(%s)' % arg2) if isinstance(arg2, int) else ('R(%s)' % arg2)
+            print('    %s(%s, %s)' % (b[0].upper(), arg1s, arg2s))
+        if not body:
+            print('    NOP()')
+        print(')')
+
+
+gen_asms(instructions)
+
