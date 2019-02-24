@@ -39,7 +39,7 @@ without function prologue / epilogues.
 
 Traditionally, the function is compiled as:
 
-```
+```asm
 pycryptonight`CryptonightR_instruction120:
     0x10fb91080 <+0>: pushq  %rbp
     0x10fb91081 <+1>: movq   %rsp, %rbp
@@ -76,7 +76,7 @@ The idea is to add a known trailing sequence to mark end of the function, such a
 
 This is NOP trail of 8 bytes. LLVM also generates another trailing, example:
 
-```
+```asm
 pycryptonight`CryptonightR_instruction2:
     0x100d9d470 <+0>:  0f af db                                imull  %ebx, %ebx
     0x100d9d473 <+3>:  90                                      nop
@@ -87,7 +87,7 @@ pycryptonight`CryptonightR_instruction2:
     0x100d9d478 <+8>:  90                                      nop
     0x100d9d479 <+9>:  90                                      nop
     0x100d9d47a <+10>: 90                                      nop
-    0x100d9d47b <+11>: 0f 0b                                   ud2    <--- THIS
+    0x100d9d47b <+11>: 0f 0b                                   ud2    ;<--- THIS
     0x100d9d47d <+13>: 0f 1f 00                                nopl   (%rax)
 ```
 
