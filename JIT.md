@@ -94,8 +94,31 @@ pycryptonight`CryptonightR_instruction2:
 but it is unknown whether other compilers do the same thing so we cannot check for this trailing.
 
 Solution:
- - when initializing the sequence, check for trailing NOPs for each function.
+ - when initializing the sequence, check for introducing and trailing NOPs for each function.
  - mark down each instruction size to an array.
+
+Example of a generated function:
+
+```asm
+pycryptonight`CryptonightR_instruction2:
+    0x10e0471d5 <+0>:  90        nop
+    0x10e0471d6 <+1>:  90        nop
+    0x10e0471d7 <+2>:  90        nop
+    0x10e0471d8 <+3>:  90        nop
+    0x10e0471d9 <+4>:  90        nop
+    0x10e0471da <+5>:  90        nop
+    0x10e0471db <+6>:  90        nop
+    0x10e0471dc <+7>:  90        nop
+    0x10e0471dd <+8>:  0f af db  imull  %ebx, %ebx
+    0x10e0471e0 <+11>: 90        nop
+    0x10e0471e1 <+12>: 90        nop
+    0x10e0471e2 <+13>: 90        nop
+    0x10e0471e3 <+14>: 90        nop
+    0x10e0471e4 <+15>: 90        nop
+    0x10e0471e5 <+16>: 90        nop
+    0x10e0471e6 <+17>: 90        nop
+    0x10e0471e7 <+18>: 90        nop
+```
 
 Note: Debugging mode messes up instruction codes when read from LLDB vs read by code.
 I.e., LLDB memory view displays correctly `0f af db` bytes, so comparison should
