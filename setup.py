@@ -24,9 +24,13 @@ docs_extras = [
     'sphinxcontrib-programoutput',
 ]
 
+no_gnu = int(os.getenv('MONERO_NO_GNU', 0))
 no_aes = int(os.getenv('MONERO_NO_AES', 0))
 no_jit = int(os.getenv('MONERO_NO_JIT', 1))
-no_gnu = int(os.getenv('MONERO_NO_GNU', 0))
+st_jit = int(os.getenv('MONERO_STATIC_JIT', 1)) and not no_jit
+du_jit = int(os.getenv('MONERO_DUMP_JIT', 0)) and not no_jit
+de_jit = int(os.getenv('MONERO_DEBUG_JIT', 0)) and not no_jit
+
 hash_module = Extension('_pycryptonight',
                         sources=[
                             'src/cryptonight/aesb.c',
@@ -50,6 +54,9 @@ hash_module = Extension('_pycryptonight',
                         define_macros=[
                            ('NO_AES', 1) if no_aes else ('USE_AES', 1),
                            ('NO_JIT', 1) if no_jit else ('USE_JIT', 1),
+                           ('STATIC_JIT', 1) if st_jit else ('XSTATIC_JIT', 1),
+                           ('DUMP_JIT', 1) if du_jit else ('XDUMP_JIT', 1),
+                           ('DEBUG_JIT', 1) if de_jit else ('XDEBUG_JIT', 1),
                         ],
                         extra_compile_args=[
                                     '-std=gnu11' if not no_gnu else '-std=c11',
