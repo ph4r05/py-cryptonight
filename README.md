@@ -8,6 +8,7 @@ Python binding for Monero hash functions `cn_fast_hash`, `cn_slow_hash`.
 - `cn_slow_hash` is CryptoNight hash function used for mining and encryption key derivation for encrypted wallet
 files.
   - Supports CNv1, CNv2, CNv4
+  - JIT tested on OSX + LLVM, experimental
 
 Py2, Py3 compatible + tests with Monero test vectors.
 
@@ -54,7 +55,7 @@ MONERO_NO_AES=1 python setup.py install
 
 ### JIT
 
-The JIT is disabled by default as the implementation was not properly tested.
+The JIT optimization is disabled by default as the implementation was not properly tested.
 If you want to experiment with JIT you need to compile with:
 
 ```bash
@@ -65,7 +66,7 @@ JIT could not be directly compiled as I am not aware of any easy way for a Pytho
 to compile `.S` file. Thus a [CryptonightR_template.c](src/cryptonight/CryptonightR_template.c) file
 was generated with [tools/convert_s_to_c.py](tools/convert_s_to_c.py) script.
 
-JIT was not tested properly. If segfaults currently.
+JIT was not tested properly on different platforms.
 
 ```bash
 MONERO_USE_CNV4_JIT=1 ./test.sh
@@ -75,9 +76,11 @@ To rebuild locally and test:
 
 ```bash
 MONERO_NO_AES=0 MONERO_NO_JIT=0 python setup.py develop
-MONERO_USE_CNV4_JIT=0 ./test.sh
-MONERO_USE_CNV4_JIT=1 ./test.sh
+MONERO_USE_CNV4_JIT=0 ./test.sh  # JIT disabled
+MONERO_USE_CNV4_JIT=1 ./test.sh  # JIT enabled
 ```
+
+For more info read [JIT.md](JIT.md)
 
 ## Donations
 Thanks for your support!

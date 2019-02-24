@@ -31,7 +31,7 @@ for idx, line in enumerate(lines):
         continue
     m = re.match(r'^FN_PREFIX\(([\w_-]+)\):$', line)
     if m:
-        is_body=False
+        is_body = False
         if fnc_name:
             instructions.append((fnc_name, body))
 
@@ -42,12 +42,10 @@ for idx, line in enumerate(lines):
         if not m2:
             raise ValueError('Problem')
         body.append(m2.groups())
+instructions.append((fnc_name, body))
 
 for fname, body in instructions:
-    print('void %s(void){' % fname)
-    if not body:
-        print('}\n')
-        continue
+    print('ASMFNC void %s(void){' % fname)
     print('  ASM_B')
     for b in body:
         arg1 = try_int(b[1])
@@ -55,5 +53,6 @@ for fname, body in instructions:
         arg1s = ('C(%s)' % arg1) if isinstance(arg1, int) else ('R(%s)' % arg1)
         arg2s = ('C(%s)' % arg2) if isinstance(arg2, int) else ('R(%s)' % arg2)
         print('    %s(%s, %s)' % (b[0].upper(), arg1s, arg2s))
+    print('    NOP()')
     print('  ASM_E')
     print('}\n')

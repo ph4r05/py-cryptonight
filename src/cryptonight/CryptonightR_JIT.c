@@ -48,10 +48,53 @@ static const uint8_t epilogue[] = {
 		JIT_code += (size); \
 	} while (0)
 
+
+#if !defined(NO_JIT)
+static unsigned inst_lengths[257];
+static uint8_t * inst_offsets[257];
+static unsigned inst_mov_lengths[257];
+static uint8_t * inst_mov_offsets[257];
+
+static const unsigned nop_len = 8;
+static const uint8_t nop_trail[] = {
+    0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
+};
+
+#define COMP_INS_ADDR(instructions, inst_offsets, inst_lengths) do {                      \
+  for(unsigned ii = 0; ii < 257; ++ii){                       \
+    const uint8_t * p1 = (const uint8_t*) (instructions)[ii]; \
+    const uint8_t * p2 = (const uint8_t*) (ii < 256 ? (instructions)[ii + 1] : p1 + 0x30); \
+    unsigned nstate = 0;                                      \
+    (inst_offsets)[ii] = (uint8_t*) instructions[0];          \
+    (inst_lengths)[ii] = 0;                                   \
+    for(const uint8_t* px = p1; px <= p2 && nstate < 2; ++px){\
+      if (memcmp(px, &nop_trail, nop_len) == 0){              \
+        if (nstate == 0)                                      \
+            (inst_offsets)[ii] = ((uint8_t *)px + 8);         \
+        else                                                  \
+            (inst_lengths)[ii] = (px - (inst_offsets)[ii]);   \
+        nstate += 1;                                          \
+        px += nop_len - 1;                                    \
+      }                                                       \
+    }                                                         \
+  }                                                           \
+} while (0)
+#endif
+
 int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_func buf, const size_t buf_size)
 {
 	uint8_t* JIT_code = (uint8_t*) buf;
 	const uint8_t* JIT_code_end = JIT_code + buf_size;
+
+	// INITIALIZATION OF THE INSTRUCTION LENGTH ARRAY
+#if !defined(NO_JIT)
+	static bool fnc_computed = false;
+	if (!fnc_computed){
+		fnc_computed = true;
+    COMP_INS_ADDR(instructions, inst_offsets, inst_lengths);
+    COMP_INS_ADDR(instructions_mov, inst_mov_offsets, inst_mov_lengths);
+	}
+#endif
 
 	APPEND_CODE(prologue, sizeof(prologue));
 
@@ -76,8 +119,15 @@ int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_f
 			if (b != prev_rot_src)
 			{
 				prev_rot_src = b;
+
+#if !defined(NO_JIT)
+				const uint8_t* p1 = inst_mov_offsets[c];
+				const uint8_t* p2 = p1 + inst_mov_lengths[c];
+#else
 				const uint8_t* p1 = (const uint8_t*) instructions_mov[c];
 				const uint8_t* p2 = (const uint8_t*) instructions_mov[c + 1];
+#endif
+
 				APPEND_CODE(p1, p2 - p1);
 			}
 			break;
@@ -86,8 +136,15 @@ int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_f
 		if (a == prev_rot_src)
 			prev_rot_src = 0xFFFFFFFFU;
 
+
+#if !defined(NO_JIT)
+		const uint8_t* p1 = inst_offsets[c];
+    const uint8_t* p2 = p1 + inst_lengths[c];
+#else
 		const uint8_t* p1 = (const uint8_t*) instructions[c];
 		const uint8_t* p2 = (const uint8_t*) instructions[c + 1];
+#endif
+
 		APPEND_CODE(p1, p2 - p1);
 
 		if (inst.opcode == ADD)
