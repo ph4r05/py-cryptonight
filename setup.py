@@ -31,6 +31,19 @@ st_jit = int(os.getenv('MONERO_STATIC_JIT', 1)) and not no_jit
 du_jit = int(os.getenv('MONERO_DUMP_JIT', 0)) and not no_jit
 de_jit = int(os.getenv('MONERO_DEBUG_JIT', 0)) and not no_jit
 
+define_macros = [
+  ('NO_AES', 1) if no_aes else None,
+  ('NO_JIT', 1) if no_jit else None,
+  ('STATIC_JIT', 1) if st_jit else None,
+  ('DUMP_JIT', 1) if du_jit else None,
+  ('DEBUG_JIT', 1) if de_jit else None,
+]
+
+compile_args = [
+    '-std=gnu11' if not no_gnu else '-std=c11',
+    '-maes' if not no_aes else None
+]
+
 hash_module = Extension('_pycryptonight',
                         sources=[
                             'src/cryptonight/aesb.c',
@@ -51,17 +64,8 @@ hash_module = Extension('_pycryptonight',
                             'src/pycryptonight.c',
                         ],
                         include_dirs=['.', 'src/', 'src/cryptonight'],
-                        define_macros=[
-                           ('NO_AES', 1) if no_aes else ('USE_AES', 1),
-                           ('NO_JIT', 1) if no_jit else ('USE_JIT', 1),
-                           ('STATIC_JIT', 1) if st_jit else ('XSTATIC_JIT', 1),
-                           ('DUMP_JIT', 1) if du_jit else ('XDUMP_JIT', 1),
-                           ('DEBUG_JIT', 1) if de_jit else ('XDEBUG_JIT', 1),
-                        ],
-                        extra_compile_args=[
-                                    '-std=gnu11' if not no_gnu else '-std=c11',
-                                    '-maes' if not no_aes else '',
-                                    # '--disable-modules=aes',
+                        define_macros=[x for x in define_macros if x],
+                        extra_compile_args=[x for x in compile_args if x],
                                     # For testing only - some of these are GCC-specific
                                     # '-Wall',
                                     # '-Wextra',
@@ -71,7 +75,6 @@ hash_module = Extension('_pycryptonight',
                                     # '-Wcast-qual',
                                     # '-Wstrict-prototypes',
                                     # '-pedantic'
-                                ],
                         )
 
 
