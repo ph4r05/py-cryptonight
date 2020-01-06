@@ -44,6 +44,14 @@ compile_args = [
     '-maes' if not no_aes else None
 ]
 
+libs = [
+
+]
+
+if sys.platform == 'win32':
+    libs = ['advapi32', 'user32']
+
+
 hash_module = Extension('_pycryptonight',
                         sources=[
                             'src/cryptonight/aesb.c',
@@ -66,6 +74,7 @@ hash_module = Extension('_pycryptonight',
                         include_dirs=['.', 'src/', 'src/cryptonight'],
                         define_macros=[x for x in define_macros if x],
                         extra_compile_args=[x for x in compile_args if x],
+                        libraries=libs,
                                     # For testing only - some of these are GCC-specific
                                     # '-Wall',
                                     # '-Wextra',
