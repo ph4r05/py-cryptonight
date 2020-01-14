@@ -230,7 +230,8 @@ int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_f
 
 	APPEND_CODE(epilogue, sizeof(epilogue));
 
+#if (defined(__GNUC__) || defined(__clang__))
 	__builtin___clear_cache((char*)buf, (char*)JIT_code);
-
+#endif
 	return 0;
 }
