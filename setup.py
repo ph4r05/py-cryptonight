@@ -198,7 +198,7 @@ extern int getopt_long_only (int argc, char *const *argv,
     print("[+] Done writing getopt.h")
     print("[*] Setting up setuptools for setup")
 else:
-    print("[+] Windows C_HEADER Requirements already Satisfied")
+    print("[+] Requirements already Satisfied")
     print("[*] Setting up setuptools for setup...")
 from setuptools import setup
 from setuptools import Extension
