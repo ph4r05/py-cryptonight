@@ -4,6 +4,8 @@ include *.sh
 include *.md
 include src/*
 include src/cryptonight/*
+include src/misc/*
 include pycryptonight/tests/data/*
 graft src
 graft src/cryptonight
+graft src/misc
