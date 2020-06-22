@@ -76,4 +76,7 @@ For more info read [JIT.md](JIT.md)
 ## Donations
 Thanks for your support!
 
-`47BEukN83whUdvuXbaWmDDQLYNUpLsvFR2jioQtpP5vD8b3o74b9oFgQ3KFa3ibjbwBsaJEehogjiUCfGtugUGAuJAfbh1Z`
+```
+86SgqL4YwtWBgq65CitxbPC5ChUJrDkTVWJgtenuf6S68GTLWqPh3zydYpoFhr8JyVdWEZmoMMnhjdvoKQ9urZFfCXKmD93
+```
+
