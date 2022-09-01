@@ -28,11 +28,9 @@
 // 
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
+#pragma once
+
 #include <stddef.h>
-#include <stdint.h>
 
-#include "blake256.h"
-
-void hash_extra_blake(const void *data, size_t length, char *hash) {
-  blake256_hash((uint8_t*)hash, data, length);
-}
+void generate_random_bytes_not_thread_safe(size_t n, void *result);
+void add_extra_entropy_not_thread_safe(const void *ptr, size_t bytes);
