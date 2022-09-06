@@ -6,7 +6,7 @@ from setuptools import setup
 from setuptools import Extension
 from setuptools import find_packages
 
-version = '0.3.7'
+version = '0.3.8'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
@@ -82,7 +82,7 @@ randomx_files = [
     'src/randomx/dataset.cpp',
     'src/randomx/instruction.cpp',
     'src/randomx/instructions_portable.cpp',
-    'src/randomx/jit_compiler_a64.cpp' if is_arm else 'src/randomx/jit_compiler_x86.cpp',
+    ('src/randomx/jit_compiler_a64.cpp' if is_arm else 'src/randomx/jit_compiler_x86.cpp'),
     'src/randomx/randomx.cpp',
     'src/randomx/soft_aes.cpp',
     'src/randomx/superscalar.cpp',
@@ -96,6 +96,10 @@ randomx_files = [
 randomx_extra = [
     'src/randomx/jit_compiler_a64_static.S' if is_arm else 'src/randomx/jit_compiler_x86_static.S'
 ]
+
+extra_objects = [] \
+    + (['src/cryptonight/CryptonightR_template.S'] if not is_arm else []) \
+    + (randomx_extra if do_rndx else [])
 
 hash_module = Extension('_pycryptonight',
                         sources=[
@@ -121,9 +125,7 @@ hash_module = Extension('_pycryptonight',
                         include_dirs=include_dirs,
                         define_macros=[x for x in define_macros if x],
                         extra_compile_args=[x for x in compile_args if x],
-                        extra_objects=[]
-                            + ['src/cryptonight/CryptonightR_template.S'] if not is_arm else []
-                            + randomx_extra if do_rndx else [],
+                        extra_objects=extra_objects,
                         libraries=libs,
                         # For testing only - some of these are GCC-specific
                         # '-Wall',
