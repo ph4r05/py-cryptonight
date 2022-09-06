@@ -681,10 +681,10 @@ STATIC INLINE void aes_pseudo_round(const uint8_t *in, uint8_t *out,
  */
 
 STATIC INLINE void aes_pseudo_round_xor(const uint8_t *in, uint8_t *out,
-                                        const uint8_t *expandedKey, const uint8_t *xor, int nblocks)
+                                        const uint8_t *expandedKey, const uint8_t *xor_, int nblocks)
 {
     __m128i *k = R128(expandedKey);
-    __m128i *x = R128(xor);
+    __m128i *x = R128(xor_);
     __m128i d;
     int i;
 
@@ -762,10 +762,10 @@ void cn_slow_hash_allocate_state(void)
 #else
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || \
   defined(__DragonFly__) || defined(__NetBSD__)
-    hp_state = mmap(0, MEMORY, PROT_READ | PROT_WRITE,
+    hp_state = (uint8_t *) mmap(0, MEMORY, PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANON, -1, 0);
 #else
-    hp_state = mmap(0, MEMORY, PROT_READ | PROT_WRITE,
+    hp_state = (uint8_t *) mmap(0, MEMORY, PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB, -1, 0);
 #endif
     if(hp_state == MAP_FAILED)
@@ -790,10 +790,10 @@ void cn_slow_hash_allocate_state(void)
 #else
 #define RESERVED_FLAGS 0
 #endif
-    hp_jitfunc_memory = mmap(0, 4096 + 4096, PROT_READ | PROT_WRITE | RESERVED_FLAGS,
+    hp_jitfunc_memory = (uint8_t *) mmap(0, 4096 + 4096, PROT_READ | PROT_WRITE | RESERVED_FLAGS,
                     MAP_PRIVATE | MAP_ANON, -1, 0);
 #else
-    hp_jitfunc_memory = mmap(0, 4096 + 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
+    hp_jitfunc_memory = (uint8_t *) mmap(0, 4096 + 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
     if(hp_jitfunc_memory == MAP_FAILED)
@@ -803,7 +803,7 @@ void cn_slow_hash_allocate_state(void)
     if (hp_jitfunc_memory == NULL)
     {
         hp_jitfunc_allocated = 0;
-        hp_jitfunc_memory = malloc(4096 + 4095);
+        hp_jitfunc_memory = (uint8_t *) malloc(4096 + 4095);
     }
     hp_jitfunc = (v4_random_math_JIT_func)((size_t)(hp_jitfunc_memory + 4095) & ~4095);
 }
@@ -909,7 +909,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     if (prehashed) {
         memcpy(&state.hs, data, length);
     } else {
-        hash_process(&state.hs, data, length);
+        hash_process(&state.hs, (const uint8_t *)data, length);
     }
     memcpy(text, state.init, INIT_SIZE_BYTE);
 

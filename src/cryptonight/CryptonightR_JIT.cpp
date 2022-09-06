@@ -8,6 +8,11 @@
 #include <sys/mman.h>
 #endif
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 #include "int-util.h"
 #include "hash-ops.h"
 #include "variant4_random_math.h"
@@ -121,3 +126,7 @@ int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_f
 	return -1;
 #endif
 }
+
+#if defined(__cplusplus)
+}
+#endif

@@ -1,11 +1,12 @@
 import sys
 import os
+import platform
 
 from setuptools import setup
 from setuptools import Extension
 from setuptools import find_packages
 
-version = '0.3.6'
+version = '0.3.7'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
@@ -31,6 +32,7 @@ st_jit = int(os.getenv('MONERO_STATIC_JIT', 1)) and not no_jit
 du_jit = int(os.getenv('MONERO_DUMP_JIT', 0)) and not no_jit
 de_jit = int(os.getenv('MONERO_DEBUG_JIT', 0)) and not no_jit
 do_rndx = int(os.getenv('MONERO_RANDOMX', 0))
+is_arm = int(os.getenv('MONERO_IS_ARM', platform.processor() == 'arm'))
 
 define_macros = [
     ('NO_AES', 1) if no_aes else None,
@@ -39,6 +41,7 @@ define_macros = [
     ('DUMP_JIT', 1) if du_jit else None,
     ('DEBUG_JIT', 1) if de_jit else None,
     ('NO_RANDOMX', 1) if not do_rndx else None,
+    ('XMR_IS_ARM', is_arm),
 ]
 
 if os.name == 'nt':
@@ -46,7 +49,8 @@ if os.name == 'nt':
 else:
     compile_args = [
         '-std=c++11' if not no_gnu else '-std=c++11',
-        '-maes' if not no_aes else None
+        '-maes' if not no_aes else None,
+        '-fpermissive',
     ]
 
 libs = []
@@ -78,8 +82,7 @@ randomx_files = [
     'src/randomx/dataset.cpp',
     'src/randomx/instruction.cpp',
     'src/randomx/instructions_portable.cpp',
-    'src/randomx/jit_compiler_a64.cpp',
-    'src/randomx/jit_compiler_x86.cpp',
+    'src/randomx/jit_compiler_a64.cpp' if is_arm else 'src/randomx/jit_compiler_x86.cpp',
     'src/randomx/randomx.cpp',
     'src/randomx/soft_aes.cpp',
     'src/randomx/superscalar.cpp',
@@ -88,6 +91,10 @@ randomx_files = [
     'src/randomx/vm_compiled_light.cpp',
     'src/randomx/vm_interpreted.cpp',
     'src/randomx/vm_interpreted_light.cpp',
+]
+
+randomx_extra = [
+    'src/randomx/jit_compiler_a64_static.S' if is_arm else 'src/randomx/jit_compiler_x86_static.S'
 ]
 
 hash_module = Extension('_pycryptonight',
@@ -114,6 +121,9 @@ hash_module = Extension('_pycryptonight',
                         include_dirs=include_dirs,
                         define_macros=[x for x in define_macros if x],
                         extra_compile_args=[x for x in compile_args if x],
+                        extra_objects=[]
+                            + ['src/cryptonight/CryptonightR_template.S'] if not is_arm else []
+                            + randomx_extra if do_rndx else [],
                         libraries=libs,
                         # For testing only - some of these are GCC-specific
                         # '-Wall',

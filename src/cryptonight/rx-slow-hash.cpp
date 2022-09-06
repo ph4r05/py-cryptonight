@@ -37,8 +37,17 @@
 #include <limits.h>
 
 #include "randomx.h"
+
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
 #include "c_threads.h"
 #include "hash-ops.h"
+#if defined(__cplusplus)
+}
+#endif
+
 #include "misc_log_ex.h"
 
 #define RX_LOGCAT	"randomx"
@@ -354,6 +363,11 @@ void rx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
     CTHR_MUTEX_UNLOCK(rx_sp->rs_mutex);
 }
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 void rx_slow_hash_allocate_state(void) {
 }
 
@@ -363,6 +377,11 @@ void rx_slow_hash_free_state(void) {
     rx_vm = NULL;
   }
 }
+
+
+#if defined(__cplusplus)
+}
+#endif
 
 void rx_stop_mining(void) {
   CTHR_MUTEX_LOCK(rx_dataset_mutex);
