@@ -24,11 +24,11 @@ To disable static JIT define `MONERO_STATIC_JIT=0`.
 ### Problem
 
 Python distutils cannot compile `.S` file so a
-[CryptonightR_template.c](src/cryptonight/CryptonightR_template.c) file
+[CryptonightR_template.c](src/cryptonight/CryptonightR_template.cpp) file
 was generated with [tools/convert_s_to_c.py](tools/convert_s_to_c.py) script.
 
 The function bodies are inlined assembly generated instructions which are
-later assembled to a function in [CryptonightR_JIT.c](src/cryptonight/CryptonightR_JIT.c), in the function:
+later assembled to a function in [CryptonightR_JIT.c](src/cryptonight/CryptonightR_JIT.cpp), in the function:
 
 ```
 int v4_generate_JIT_code(const struct V4_Instruction* code, v4_random_math_JIT_func buf, const size_t buf_size)

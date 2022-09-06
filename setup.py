@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools import Extension
 from setuptools import find_packages
 
-version = '0.3.5'
+version = '0.3.6'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
@@ -30,6 +30,7 @@ no_jit = int(os.getenv('MONERO_NO_JIT', 1))
 st_jit = int(os.getenv('MONERO_STATIC_JIT', 1)) and not no_jit
 du_jit = int(os.getenv('MONERO_DUMP_JIT', 0)) and not no_jit
 de_jit = int(os.getenv('MONERO_DEBUG_JIT', 0)) and not no_jit
+do_rndx = int(os.getenv('MONERO_RANDOMX', 0))
 
 define_macros = [
     ('NO_AES', 1) if no_aes else None,
@@ -37,13 +38,14 @@ define_macros = [
     ('STATIC_JIT', 1) if st_jit else None,
     ('DUMP_JIT', 1) if du_jit else None,
     ('DEBUG_JIT', 1) if de_jit else None,
+    ('NO_RANDOMX', 1) if not do_rndx else None,
 ]
 
 if os.name == 'nt':
     compile_args = []  # AzeS: Maybe some cl.exe args that would be interesting?
 else:
     compile_args = [
-        '-std=gnu11' if not no_gnu else '-std=c11',
+        '-std=c++11' if not no_gnu else '-std=c++11',
         '-maes' if not no_aes else None
     ]
 
@@ -52,29 +54,63 @@ libs = []
 if sys.platform == 'win32':
     libs = ['advapi32', 'user32']
 
-include_dirs = ['.', 'src/', 'src/cryptonight']
+include_dirs = ['.', 'src/', 'src/cryptonight', 'src/randomx']
 if os.name == 'nt':
     include_dirs.insert(2, 'src/misc')
 
+randomx_files = [
+    'src/cryptonight/rx-slow-hash.cpp',
+
+    'src/randomx/blake2/blake2b.cpp',
+    'src/randomx/argon2_avx2.cpp',
+    'src/randomx/argon2_core.cpp',
+    'src/randomx/argon2_ref.cpp',
+    'src/randomx/argon2_ssse3.cpp',
+    'src/randomx/reciprocal.cpp',
+    'src/randomx/virtual_memory.cpp',
+
+    'src/randomx/aes_hash.cpp',
+    'src/randomx/allocator.cpp',
+    'src/randomx/assembly_generator_x86.cpp',
+    'src/randomx/blake2_generator.cpp',
+    'src/randomx/bytecode_machine.cpp',
+    'src/randomx/cpu.cpp',
+    'src/randomx/dataset.cpp',
+    'src/randomx/instruction.cpp',
+    'src/randomx/instructions_portable.cpp',
+    'src/randomx/jit_compiler_a64.cpp',
+    'src/randomx/jit_compiler_x86.cpp',
+    'src/randomx/randomx.cpp',
+    'src/randomx/soft_aes.cpp',
+    'src/randomx/superscalar.cpp',
+    'src/randomx/virtual_machine.cpp',
+    'src/randomx/vm_compiled.cpp',
+    'src/randomx/vm_compiled_light.cpp',
+    'src/randomx/vm_interpreted.cpp',
+    'src/randomx/vm_interpreted_light.cpp',
+]
+
 hash_module = Extension('_pycryptonight',
                         sources=[
-                            'src/cryptonight/aesb.c',
-                            'src/cryptonight/blake256.c',
-                            'src/cryptonight/CryptonightR_JIT.c',
-                            'src/cryptonight/CryptonightR_template.c',
-                            'src/cryptonight/groestl.c',
-                            'src/cryptonight/hash.c',
-                            'src/cryptonight/hash-extra-blake.c',
-                            'src/cryptonight/hash-extra-groestl.c',
-                            'src/cryptonight/hash-extra-jh.c',
-                            'src/cryptonight/hash-extra-skein.c',
-                            'src/cryptonight/jh.c',
-                            'src/cryptonight/keccak.c',
-                            'src/cryptonight/oaes_lib.c',
-                            'src/cryptonight/skein.c',
-                            'src/cryptonight/slow-hash.c',
-                            'src/pycryptonight.c',
-                        ],
+                            'src/cryptonight/aesb.cpp',
+                            'src/cryptonight/blake256.cpp',
+                            'src/cryptonight/CryptonightR_JIT.cpp',
+                            'src/cryptonight/CryptonightR_template.cpp',
+                            'src/cryptonight/groestl.cpp',
+                            'src/cryptonight/hash.cpp',
+                            'src/cryptonight/hash-extra-blake.cpp',
+                            'src/cryptonight/hash-extra-groestl.cpp',
+                            'src/cryptonight/hash-extra-jh.cpp',
+                            'src/cryptonight/hash-extra-skein.cpp',
+                            'src/cryptonight/jh.cpp',
+                            'src/cryptonight/keccak.cpp',
+                            'src/cryptonight/memwipe.cpp',
+                            'src/cryptonight/oaes_lib.cpp',
+                            'src/cryptonight/skein.cpp',
+                            'src/cryptonight/slow-hash.cpp',
+
+                            'src/pycryptonight.cpp',
+                        ] + (randomx_files if do_rndx else []),
                         include_dirs=include_dirs,
                         define_macros=[x for x in define_macros if x],
                         extra_compile_args=[x for x in compile_args if x],
