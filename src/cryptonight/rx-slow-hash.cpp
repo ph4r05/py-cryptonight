@@ -58,6 +58,11 @@ extern "C"
 #define THREADV __thread
 #endif
 
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
 typedef struct rx_state {
   CTHR_MUTEX_TYPE rs_mutex;
   char rs_hash[HASH_SIZE];
@@ -362,11 +367,6 @@ void rx_slow_hash(const uint64_t mainheight, const uint64_t seedheight, const ch
   if (is_alt)
     CTHR_MUTEX_UNLOCK(rx_sp->rs_mutex);
 }
-
-#if defined(__cplusplus)
-extern "C"
-{
-#endif
 
 void rx_slow_hash_allocate_state(void) {
 }
