@@ -6,7 +6,7 @@ from setuptools import setup
 from setuptools import Extension
 from setuptools import find_packages
 
-version = '0.3.8'
+version = '1.0.0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
